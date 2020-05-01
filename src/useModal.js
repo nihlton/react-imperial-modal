@@ -15,20 +15,18 @@ export const useModal = () => {
   const context = useContext(ModalContext);
   
   useEffect(() => {
-    localModalEntries.filter(modalEntry => !prevEntries.includes(modalEntry))
-      .forEach(modalEntry => {
-        context.addModal(modalEntry)
-      })
-    prevEntries.filter(modalEntry => !localModalEntries.includes(modalEntry))
-      .forEach(modalEntry => {
-        context.removeModal(modalEntry)
-      })
-  }, [localModalEntries])
+    const addedModals = localModalEntries.filter(modalEntry => !prevEntries.includes(modalEntry))
+    const removedModals = prevEntries.filter(modalEntry => !localModalEntries.includes(modalEntry))
   
-  const open = (modal) => {
+    addedModals.forEach(modalEntry => { context.addModal(modalEntry) })
+    removedModals.forEach(modalEntry => { context.removeModal(modalEntry) })
+    
+  }, [ localModalEntries ])
+  
+  const open = (modal, label = '', role = 'dialog') => {
     let resolver
     const modalPromise = new Promise((resolve) => { resolver = resolve })
-    const modalEntry = {modal, resolver}
+    const modalEntry = {modal, resolver, label, role}
     setLocalModalEntries(currentModalEntries => [...currentModalEntries, modalEntry ])
     
     return modalPromise
