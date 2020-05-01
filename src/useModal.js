@@ -1,33 +1,48 @@
-import { useContext, useCallback } from 'react'
+import { useRef, useState, useEffect, useContext } from 'react'
 import ModalContext from './ModalContext'
 
+export function usePrevious(value) {
+  const ref = useRef()
+  useEffect(() => { ref.current = value }, [value])
+  
+  return ref.current
+}
+
 export const useModal = () => {
+  const [ localModalEntries, setLocalModalEntries ] = useState([])
+  const prevEntries = usePrevious(localModalEntries) || []
+  
   const context = useContext(ModalContext);
   
-  return useCallback(() => {
+  useEffect(() => {
+    localModalEntries.filter(modalEntry => !prevEntries.includes(modalEntry))
+      .forEach(modalEntry => {
+        context.addModal(modalEntry)
+      })
+    prevEntries.filter(modalEntry => !localModalEntries.includes(modalEntry))
+      .forEach(modalEntry => {
+        context.removeModal(modalEntry)
+      })
+  }, [localModalEntries])
+  
+  const open = (modal) => {
     let resolver
-    let thisModal
-  
     const modalPromise = new Promise((resolve) => { resolver = resolve })
+    const modalEntry = {modal, resolver}
+    setLocalModalEntries(currentModalEntries => [...currentModalEntries, modalEntry ])
     
-    const open = (modal) => {
-      if (!thisModal) {
-        thisModal = modal
-        context.addModal(modal)
-        return modalPromise
-      } else {
-        console.warn(`tried to open a modal that was already opened`)
-      }
-    }
+    return modalPromise
+  }
   
-    const close = (result) => {
-      if (thisModal) {
-        context.removeModal(context)
-        return resolver(result)
-      } else {
-        console.warn(`tried to close a modal that hasn't opened`)
-      }
-    }
-    return [ open, close ]
-  }, [])
+  const close = (modal, result) => {
+    setLocalModalEntries(currentModalEntries => {
+      const thisEntry = currentModalEntries.find(entry => entry.modal === modal)
+      const newModalEntries = [...currentModalEntries]
+      newModalEntries.splice(newModalEntries.indexOf(thisEntry), 1)
+      thisEntry.resolver(result)
+      return newModalEntries
+    })
+  }
+  
+  return [ open, close ]
 }
