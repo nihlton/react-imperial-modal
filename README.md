@@ -1,4 +1,4 @@
-#👑 react-imperial-modal 👑 [VERY BETA]
+# 👑 react-imperial-modal 👑 [VERY BETA]
 **Imperative API for modals**
 
 Often, a interactive branching UI flow is complex enough that a declarative approach becomes too cumbersome and verbose.  Imagine an experience where an application prompts a user to confirm before a destructive action, then confirms the success or failure of the action.  The content of those modals, the result of the actions - all has to go into the state.
@@ -9,29 +9,28 @@ How imagine an imperative API implementation.
 
 ```javascript
   const [ userInput, setUserInput ] = useState('')
-  const createModal = useModal()
+  const [ openModal, closeModal ] = useModal()
   
   const getUsersColor = async () => {
-    const [openColorModal, closeColorModal] = createModal()
-    const favoriteColor = await openColorModal(
-      <Prompt
-        message='what is your favorite color?'
-        close={closeColorModal}/>)
+    const colorModal = <Prompt message='what is your favorite color?' close={color => closeModal(colorModal, color)}/>
+    const favoriteColor = await openModal(colorModal)
   
     if (favoriteColor) {
-      const [ openAlertModal, closeAlertModal ] = createModal()
+      const alertModal = <Alert message={`your favorite color is ${favoriteColor}`} close={() => closeModal(alertModal)}/>
       setUserInput(favoriteColor)
-      openAlertModal(
-        <Alert
-          message={`your favorite color is ${favoriteColor}`}
-          close={closeAlertModal}/>)
+      openModal(alertModal)
+    } else {
+      const alertModal = <Alert message={`you didn't provide a color`} close={() => closeModal(alertModal)}/>
+      openModal(alertModal)
     }
   }
 ```
 
+[LIVE DEMO](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
+
 # TO DO
 
-  - finalize API signature. (can we make generic open open/close methods?)
+  - idiot proof (null checks, warnings etc)
   - accessibility
     - manage focus
     - handle escape key
