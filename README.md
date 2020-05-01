@@ -26,9 +26,11 @@ How imagine an imperative API implementation.
   }
 ```
 
+[LIVE DEMO](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
+
 # TO DO
 
-  - finalize API signature. (can we make generic open open/close methods?)
+  - idiot proof (null checks, warnings etc)
   - accessibility
     - manage focus
     - handle escape key
