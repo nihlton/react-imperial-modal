@@ -9,22 +9,19 @@ How imagine an imperative API implementation.
 
 ```javascript
   const [ userInput, setUserInput ] = useState('')
-  const createModal = useModal()
+  const [ openModal, closeModal ] = useModal()
   
   const getUsersColor = async () => {
-    const [openColorModal, closeColorModal] = createModal()
-    const favoriteColor = await openColorModal(
-      <Prompt
-        message='what is your favorite color?'
-        close={closeColorModal}/>)
+    const colorModal = <Prompt message='what is your favorite color?' close={color => closeModal(colorModal, color)}/>
+    const favoriteColor = await openModal(colorModal)
   
     if (favoriteColor) {
-      const [ openAlertModal, closeAlertModal ] = createModal()
+      const alertModal = <Alert message={`your favorite color is ${favoriteColor}`} close={() => closeModal(alertModal)}/>
       setUserInput(favoriteColor)
-      openAlertModal(
-        <Alert
-          message={`your favorite color is ${favoriteColor}`}
-          close={closeAlertModal}/>)
+      openModal(alertModal)
+    } else {
+      const alertModal = <Alert message={`you didn't provide a color`} close={() => closeModal(alertModal)}/>
+      openModal(alertModal)
     }
   }
 ```
