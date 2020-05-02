@@ -119,6 +119,7 @@ or
     const colorModal = <Prompt
       message='what is your favorite color?'
       close={color => closeModal(colorModal, color)}/>
+      
     openModal(colorModal).then(favoriteColor => {
     
       console.log(favoriteColor)
