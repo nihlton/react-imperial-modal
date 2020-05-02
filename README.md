@@ -9,6 +9,14 @@ Now imagine an imperative API implementation.
 
 ## Usage
 
+```
+yarn add react-imperial-modal
+```
+or
+```
+npm install react-imperial-modal
+```
+
 wrap your app with `<ModalProvider>`
 
 ```javascript
