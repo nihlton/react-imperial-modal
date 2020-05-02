@@ -187,8 +187,9 @@ No default CSS is provided or applied.  The following is provided as a recommend
 }
 ```
 
-[LIVE DEMO](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
+[LIVE DEMO WITH CODE](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
 
+[LIVE DEMO NO CODE](https://5exs1.csb.app/)
 
 # TO DO
   - idiot proof (null checks, warnings etc)
