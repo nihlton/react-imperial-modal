@@ -57,8 +57,7 @@ Import the `useModal` hook.  it provides two methods, `openModal`, and `closeMod
 
     
 ## Note:
-the **modal** argument should be defined ahead of time, since its reference is used to both open and close the modal.
-Defining the modal within the `openModal` function call will result in a permenent (unclosable) modal.  Maybe you're into that, i don't know.
+the **modal** argument should be defined ahead of time, since its reference is used to both open and close the modal. Defining the modal within the `openModal` function call will mean you can't close the modal programatically.  The user can still close it by clicking the back drop, or hitting the escape key.
 
 
 ## Advanced Usage
