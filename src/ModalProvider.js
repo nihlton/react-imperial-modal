@@ -13,14 +13,14 @@ const previouslyFocusedElements = []
 const ESC_KEY = 'Escape'
 
 
-export const ModalProvider = ({ children, config = {}, appElement }) => {
+export const ModalProvider = ({ children, config = {}, appElement = () => {} }) => {
   const [ modalEntries, setModalEntries ] = useState([])
   const configuration = {...defaultConfig, config}
   const appContainer = useRef()
   
   useEffect(() => {
     const hasModals = modalEntries.length > 0
-    const ariaTarget = appElement || appContainer?.current
+    const ariaTarget = appElement() || appContainer?.current
     
     if (hasModals) {
       document?.body?.classList.add(configuration.bodyOpenClass)
