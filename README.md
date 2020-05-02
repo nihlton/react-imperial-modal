@@ -116,7 +116,9 @@ you can:
 or
 ```javascript
   const getUsersColor = () => {
-    const colorModal = <Prompt message='what is your favorite color?' close={color => closeModal(colorModal, color)}/>
+    const colorModal = <Prompt
+      message='what is your favorite color?'
+      close={color => closeModal(colorModal, color)}/>
     openModal(colorModal).then(favoriteColor => {
     
       console.log(favoriteColor)
