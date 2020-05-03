@@ -12,29 +12,34 @@ const defaultConfig = {
 const previouslyFocusedElements = []
 const ESC_KEY = 'Escape'
 
-
 export const ModalProvider = ({ children, config = {}, appElement = () => {} }) => {
   const [ modalEntries, setModalEntries ] = useState([])
   const configuration = {...defaultConfig, config}
   const appContainer = useRef()
   
-  useEffect(() => {
-    const hasModals = modalEntries.length > 0
+  const modalSetup = () => {
+    // showing first modal
     const ariaTarget = appElement() || appContainer?.current
-    
-    if (hasModals) {
-      document?.body?.classList.add(configuration.bodyOpenClass)
-      ariaTarget.setAttribute('aria-hidden', 'true');
-    } else {
-      document?.body?.classList.remove(configuration.bodyOpenClass)
-      ariaTarget.removeAttribute('aria-hidden');
-    }
-  }, [modalEntries])
+    document.documentElement.style.overflow = 'hidden'
+    document.body.classList.add(configuration.bodyOpenClass)
+    ariaTarget.setAttribute('aria-hidden', 'true');
+  }
   
+  const modalTakeDown = () => {
+    // removing last modal
+    const ariaTarget = appElement() || appContainer?.current
+    document.documentElement.style.overflow = ''
+    document?.body?.classList.remove(configuration.bodyOpenClass)
+    ariaTarget.removeAttribute('aria-hidden');
+  }
   
   const addModal = useCallback((modalEntry) => {
     // remember where focus was
     previouslyFocusedElements.push(document.activeElement)
+    
+    if (modalEntries.length === 0) {
+      modalSetup()
+    }
     
     if (modalEntries.includes(modalEntry)) {
       console.warn('tried to open a modal that was already opened')
@@ -48,6 +53,10 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }) 
     const previouslyFocusedElement = previouslyFocusedElements.pop()
     if (document.documentElement.contains(previouslyFocusedElement)) {
       previouslyFocusedElement.focus()
+    }
+  
+    if (modalEntries.length === 1) {
+      modalTakeDown()
     }
     
     if (modalEntries.includes(modalEntry)) {
