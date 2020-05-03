@@ -8,9 +8,8 @@ Now imagine that same page has actions for adding items, editing them etc.  It a
 Now imagine an imperative API implementation.
 
 
-[LIVE DEMO WITH CODE](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
+[LIVE DEMO](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
 
-[LIVE DEMO NO CODE](https://5exs1.csb.app/)
 
 ## Usage
 
@@ -198,5 +197,4 @@ No default CSS is provided or applied.  The following is provided as a recommend
 
 # TO DO
   - idiot proof (null checks, warnings etc)
-  - prevent body from scrolling while modals are open 
 
