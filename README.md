@@ -1,4 +1,4 @@
-# 👑 react-imperial-modal 👑 [sorta BETA]
+# 👑 react-imperial-modal [sorta BETA]
 **Imperative API for modals**
 
 Often, a interactive branching UI flow is complex enough that a declarative approach becomes too cumbersome and verbose.  Imagine an experience where an application prompts a user to confirm before a destructive action, then confirms the success or failure of the action.  The content of those modals, the result of the actions - all has to go into the state.
@@ -198,4 +198,5 @@ No default CSS is provided or applied.  The following is provided as a recommend
 
 # TO DO
   - idiot proof (null checks, warnings etc)
+  - prevent body from scrolling while modals are open 
 
