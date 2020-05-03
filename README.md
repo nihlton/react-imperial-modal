@@ -1,4 +1,4 @@
-# 👑 react-imperial-modal 👑 [sorta BETA]
+# 👑 react-imperial-modal [sorta BETA]
 **Imperative API for modals**
 
 Often, a interactive branching UI flow is complex enough that a declarative approach becomes too cumbersome and verbose.  Imagine an experience where an application prompts a user to confirm before a destructive action, then confirms the success or failure of the action.  The content of those modals, the result of the actions - all has to go into the state.
@@ -8,9 +8,8 @@ Now imagine that same page has actions for adding items, editing them etc.  It a
 Now imagine an imperative API implementation.
 
 
-[LIVE DEMO WITH CODE](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
+[LIVE DEMO](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
 
-[LIVE DEMO NO CODE](https://5exs1.csb.app/)
 
 ## Usage
 
