@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { ReactElement } from 'react'
 import { ModalContext } from './ModalContext'
 import Modal from './Modal'
 
-import {ModalEntry, ModalProviderProps} from './types'
+import { ModalEntry, ModalProviderProps } from './types'
 
 const { useRef, useState, useCallback, useMemo } = React
 
@@ -17,7 +18,7 @@ const previouslyFocusedElements : HTMLElement[] = []
 const ESC_KEY = 'Escape'
 
 
-export const ModalProvider = ({ children, config = {}, appElement = () => {} }: ModalProviderProps ) => {
+export const ModalProvider = ({ children, config = {}, appElement = () => {} }: ModalProviderProps ) : ReactElement => {
   const [ modalEntries, setModalEntries ] = useState([])
   const configuration = {...defaultConfig, ...config}
   const appContainer = useRef()
