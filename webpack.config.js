@@ -2,14 +2,33 @@ const path = require('path');
 
 module.exports = {
   mode: 'production',
-  entry: './src/index.js',
+  entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'index.js',
+    filename: '../build/index.js',
     libraryTarget: 'commonjs2'
+  },
+  devtool: 'source-map',
+  resolve: {
+    // Add '.ts' and '.tsx' as resolvable extensions.
+    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   module: {
     rules: [
+      {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: "ts-loader"
+          }
+        ]
+      },
+      {
+        enforce: "pre",
+        test: /\.js$/,
+        loader: "source-map-loader"
+      },
       {
         test: /\.js$/,
         include: path.resolve(__dirname, 'src'),
@@ -20,7 +39,7 @@ module.exports = {
             presets: ["@babel/env"],
           }
         }
-      }
+      },
     ]
   },
   externals: {

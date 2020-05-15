@@ -1,6 +1,10 @@
-import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react'
-import ModalContext from './ModalContext'
+import * as React from 'react'
+import { ModalContext } from './ModalContext'
 import Modal from './Modal'
+
+import {ModalEntry, ModalProviderProps} from './types'
+
+const { useRef, useState, useCallback, useMemo } = React
 
 const defaultConfig = {
   bodyOpenClass: 'modal-open',
@@ -9,15 +13,16 @@ const defaultConfig = {
   modalClass: 'modal'
 }
 
-const previouslyFocusedElements = []
+const previouslyFocusedElements : HTMLElement[] = []
 const ESC_KEY = 'Escape'
 
-export const ModalProvider = ({ children, config = {}, appElement = () => {} }) => {
+
+export const ModalProvider = ({ children, config = {}, appElement = () => {} }: ModalProviderProps ) => {
   const [ modalEntries, setModalEntries ] = useState([])
-  const configuration = {...defaultConfig, config}
+  const configuration = {...defaultConfig, ...config}
   const appContainer = useRef()
   
-  const modalSetup = () => {
+  const modalSetup = () : void => {
     // showing first modal
     const ariaTarget = appElement() || appContainer?.current
     document.documentElement.style.overflow = 'hidden'
@@ -25,7 +30,7 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }) 
     ariaTarget.setAttribute('aria-hidden', 'true');
   }
   
-  const modalTakeDown = () => {
+  const modalTakeDown = () : void => {
     // removing last modal
     const ariaTarget = appElement() || appContainer?.current
     document.documentElement.style.overflow = ''
@@ -33,9 +38,9 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }) 
     ariaTarget.removeAttribute('aria-hidden');
   }
   
-  const addModal = useCallback((modalEntry) => {
+  const addModal = useCallback((modalEntry : ModalEntry) : void => {
     // remember where focus was
-    previouslyFocusedElements.push(document.activeElement)
+    previouslyFocusedElements.push(document.activeElement as HTMLInputElement)
     
     if (modalEntries.length === 0) {
       modalSetup()
@@ -48,9 +53,9 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }) 
     }
   }, [modalEntries])
   
-  const removeModal = useCallback((modalEntry) => {
+  const removeModal = useCallback((modalEntry : ModalEntry) : void => {
     // set focus back
-    const previouslyFocusedElement = previouslyFocusedElements.pop()
+    const previouslyFocusedElement:HTMLElement = previouslyFocusedElements.pop()
     if (document.documentElement.contains(previouslyFocusedElement)) {
       previouslyFocusedElement.focus()
     }
@@ -71,25 +76,21 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }) 
   }, [modalEntries])
   
   const contextValue = useMemo(() => ({ addModal, removeModal }), [modalEntries]);
-  const handleKey = e => {
-    if (e.key === ESC_KEY) {
+  const handleKey = (event : React.KeyboardEvent) : void => {
+    if (event.key === ESC_KEY) {
       internalClose(modalEntries.slice(-1)[0])
     }
   }
-  const internalClose = (entry) => {
+
+  const internalClose = (entry: ModalEntry) : void => {
     entry.resolver()
     removeModal(entry)
   }
   
   return <ModalContext.Provider value={contextValue}>
     <React.Fragment>
-      <div ref={appContainer}>
-        {children}
-      </div>
-      {modalEntries.length > 0 && <div
-        className={configuration.modalContainerClass}
-        onKeyDown={handleKey}
-      >
+      <div ref={appContainer}>{children}</div>
+      {modalEntries.length > 0 && <div className={configuration.modalContainerClass} onKeyDown={handleKey}>
         {modalEntries.map((modalEntry, i) => (
           <Modal
             key={`modal-${i}`}

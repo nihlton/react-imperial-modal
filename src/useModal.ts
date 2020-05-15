@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect, useContext } from 'react'
-import ModalContext from './ModalContext'
+import {useRef, useState, useEffect, useContext, ReactElement} from 'react'
+import { ModalContext } from './ModalContext'
+import {ModalEntry} from "./types";
 
-export function usePrevious(value) {
+export function usePrevious(value : any) : any {
   const ref = useRef()
   useEffect(() => { ref.current = value }, [value])
   
@@ -10,7 +11,7 @@ export function usePrevious(value) {
 
 export const useModal = () => {
   const [ localModalEntries, setLocalModalEntries ] = useState([])
-  const prevEntries = usePrevious(localModalEntries) || []
+  const prevEntries: ModalEntry[] = usePrevious(localModalEntries) || []
   
   const context = useContext(ModalContext);
   
@@ -20,11 +21,10 @@ export const useModal = () => {
   
     addedModals.forEach(modalEntry => { context.addModal(modalEntry) })
     removedModals.forEach(modalEntry => { context.removeModal(modalEntry) })
-    
   }, [ localModalEntries ])
   
-  const open = (modal, label = '', role = 'dialog') => {
-    let resolver
+  const open = (modal : ReactElement, label: string = '', role: string = 'dialog') : Promise<any> => {
+    let resolver: () => any
     const modalPromise = new Promise((resolve) => { resolver = resolve })
     const modalEntry = {modal, resolver, label, role}
     setLocalModalEntries(currentModalEntries => [...currentModalEntries, modalEntry ])
@@ -32,7 +32,7 @@ export const useModal = () => {
     return modalPromise
   }
   
-  const close = (modal, result) => {
+  const close = (modal: ReactElement, result: any) : void => {
     setLocalModalEntries(currentModalEntries => {
       const thisEntry = currentModalEntries.find(entry => entry.modal === modal)
       const newModalEntries = [...currentModalEntries]
