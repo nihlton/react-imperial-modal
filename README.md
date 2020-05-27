@@ -92,16 +92,6 @@ const Prompt = function(props) {
     <button onClick={() => close(promptValue)}>ok</button>
   </div>
 }
-
-const Alert = function(props) {
-  const { message, close } = props
-  
-  return <div>
-    <h1>Alert</h1>
-    <p>{message}</p>
-    <button onClick={close}>ok</button>
-  </div>
-}
 ```
 
 you can:
