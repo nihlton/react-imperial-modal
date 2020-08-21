@@ -77,9 +77,18 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }: 
   }, [modalEntries])
   
   const contextValue = useMemo(() => ({ addModal, removeModal }), [modalEntries]);
-  const handleKey = (event : React.KeyboardEvent) : void => {
-    if (event.key === ESC_KEY) {
+
+  const handleShade = () => {
+    const topModal = modalEntries.slice(-1)[0]
+    if (topModal.userDismiss) {
       internalClose(modalEntries.slice(-1)[0])
+    }
+  }
+
+  const handleKey = (event : React.KeyboardEvent) : void => {
+    const topModal = modalEntries.slice(-1)[0]
+    if (event.key === ESC_KEY && topModal.userDismiss) {
+      internalClose(topModal)
     }
   }
 
@@ -100,7 +109,7 @@ export const ModalProvider = ({ children, config = {}, appElement = () => {} }: 
             role={modalEntry.role}
           >{modalEntry.modal}</Modal>
         ))}
-        <div className={configuration.modalShadeClass} onClick={() => internalClose(modalEntries.slice(-1)[0])} />
+        <div className={configuration.modalShadeClass} onClick={handleShade} />
       </div>}
     </React.Fragment>
   </ModalContext.Provider>

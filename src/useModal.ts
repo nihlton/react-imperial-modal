@@ -23,10 +23,10 @@ export const useModal = () => {
     removedModals.forEach(modalEntry => { context.removeModal(modalEntry) })
   }, [ localModalEntries ])
   
-  const open = (modal : ReactElement, label: string = '', role: string = 'dialog') : Promise<any> => {
+  const open = (modal : ReactElement, label: string = '', role: string = 'dialog', userDismiss: boolean = true): Promise<any> => {
     let resolver: () => any
     const modalPromise = new Promise((resolve) => { resolver = resolve })
-    const modalEntry = {modal, resolver, label, role}
+    const modalEntry = {modal, resolver, label, role, userDismiss}
     setLocalModalEntries(currentModalEntries => [...currentModalEntries, modalEntry ])
     
     return modalPromise
