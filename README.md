@@ -78,21 +78,6 @@ Import the `useModal` hook
 
 ## Advanced Usage
 
-### `openModal`  
-
-The `openModal` method accepts a number of additional arguments.
-
-```typescript
-  <T, P>(
-    Component: React.ComponentType<P & ModalProps<T>>,
-    componentProps: P,              
-    ignoreEscape: boolean = false,  // `true` prevents the `ESC` key from closing the modal
-    label?: string,                 // aria attributes 
-    labelledby?: string,            // ..
-    role: string = 'dialog',        // ..
-  )
-```
-
 ### `ModalProps` and Promises 
 
 The `openModal` method returns a promise which can be resolved within the modal.  The `ModalProps` type accepts an optional type argument that determines what values the promise will return.
@@ -101,10 +86,10 @@ given:
 ```typescript
   export interface ModalProps<T = void> {
     modalId: string;
-    resolve: (val: T) => void;
-    reject: (reason?: unknown) => void;
-    close: () => void;
-  }
+    resolve: (val: T) => void;           // resolve the promise with the given value
+    reject: (reason?: unknown) => void;  // rejects the promise with the given value
+    close: () => void;                   // closes the modal.  Does not resolve the modal - 
+  }                                      //  - any code waiting for the promise will not execute.
 ```
 
 you can:
@@ -155,6 +140,44 @@ or
   };
 ```
 
+### `openModal`  
+
+The `openModal` method accepts a number of additional arguments.
+
+```typescript
+  <T, P>(
+    Component: React.ComponentType<P & ModalProps<T>>,
+    componentProps: P,              
+    ignoreEscape: boolean = false,  // `true` prevents the `ESC` key from closing the modal
+    label?: string,                 // aria attributes 
+    labelledby?: string,            // ..
+    role: string = 'dialog',        // ..
+  )
+```
+
+### ModalProvider Config
+you can specify `class` attributes for the `<body/>` element, as well as the each modal element, and their container
+
+```typeScript
+  type ModalProviderConfig = {
+    bodyOpenClass?: string;
+    modalContainerClass?: string;
+    modalClass?: string;
+  };
+```
+```tsx
+  const modalConfiguration = {
+    bodyOpenClass: 'blur';
+    modalContainerClass: 'modals';
+    modalClass: 'modal';
+  }
+
+  <ModalProvider config={modalConfiguration} >
+    <App />
+  </ModalProvider>
+```
+
+
 ### `useModalDangerously` 
 
 `useModalDangerously` provides additional methods which can be used to control opened modal instances. These methods are offered as an escape hatch and should be used carefully.
@@ -189,31 +212,6 @@ then:
   closeModal(); // id not provided.  will close the most recent modal
 ```
 
-
-### ModalProvider Config
-you can specify `class` attributes for the `<body/>` element, as well as the each modal element, and their container
-
-```typeScript
-  type ModalProviderConfig = {
-    bodyOpenClass?: string;
-    modalContainerClass?: string;
-    modalClass?: string;
-  };
-```
-```tsx
-  const modalConfiguration = {
-    bodyOpenClass: 'blur';
-    modalContainerClass: 'modals';
-    modalClass: 'modal';
-  }
-
-  <ModalProvider config={modalConfiguration} >
-    <App />
-  </ModalProvider>
-```
-
 ## CSS and styling
 
-No default CSS is provided nor applied.  The following is provided as a recommendation, or starting point.
-
-
+No default CSS is provided nor applied.  
