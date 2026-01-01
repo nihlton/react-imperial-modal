@@ -1,0 +1,70 @@
+body {
+  background: white;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+.modal-open .App {
+  filter: blur(3px) contrast(0.25);
+}
+
+.App {
+  transition: filter 0.1s ease;
+  text-align: center;
+  padding: 2rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+}
+
+button {
+  margin: 0.5rem 0.25rem;
+  border: none;
+  background: #eee;
+  padding: 0.75rem 1.25rem;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  font-weight: bold;
+}
+
+button:focus,
+button:active {
+  outline: none;
+  color: #08e;
+  box-shadow: 0 0 0 2px inset;
+}
+
+input {
+  border: none;
+  background: #eee;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 2px #0001 inset;
+}
+
+input:focus,
+input:active {
+  outline: none;
+  box-shadow: 0 0 0 2px #08e inset;
+}
+
+dialog {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  position: relative;
+  z-index: 4000;
+  border: none;
+  border-radius: 0.25rem;
+  outline: none;
+  box-shadow:
+    0 0 0.5rem #0003,
+    0 1rem 2rem #0003;
+}

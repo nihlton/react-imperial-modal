@@ -1,10 +1,25 @@
 {
   "compilerOptions": {
-    "outDir": "./build/",
-    "sourceMap": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es6",
-    "jsx": "react"
-  }
+    "module": "esnext",
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "lib": ["es2022", "dom", "dom.iterable"]
+  },
+  // Include the necessary files for your project
+  "include": ["src/*.ts", "src/*.tsx"],
+  "exclude": ["node_modules"]
 }

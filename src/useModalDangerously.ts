@@ -3,9 +3,9 @@ import { ModalContext } from './ModalProvider';
 import type { ModalEntry, ModalProps } from './types';
 import { modalId, withResolvers } from './constants';
 
-export const useModal = () => {
+export const useModalDangerously = () => {
   const context = useContext(ModalContext);
-  return useCallback(
+  const openModal = useCallback(
     <T, P>(
       Component: React.ComponentType<P & ModalProps<T>>,
       componentProps: P,
@@ -42,4 +42,6 @@ export const useModal = () => {
     },
     [context],
   );
+
+  return [openModal, context.removeModal, context.resolveModal, context.rejectModal] as const;
 };

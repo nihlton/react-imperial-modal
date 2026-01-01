@@ -1,50 +1,53 @@
-import * as React from 'react'
-import {ReactChildren, ReactElement} from "react";
-const { useRef, useEffect } = React
+import React, { useCallback, useContext, useLayoutEffect, useRef } from 'react';
+import type { ModalEntry } from './types';
+import { ModalContext } from './ModalProvider';
+import { ESC_KEY, focusableSelector } from './constants';
 
-const focusableSelector = [
-  'a[href]:not([tabindex=\'-1\'])',
-  'area[href]:not([tabindex=\'-1\'])',
-  'input:not([disabled]):not([tabindex=\'-1\'])',
-  'select:not([disabled]):not([tabindex=\'-1\'])',
-  'textarea:not([disabled]):not([tabindex=\'-1\'])',
-  'button:not([disabled]):not([tabindex=\'-1\'])',
-  'iframe:not([tabindex=\'-1\'])',
-  '[tabindex]:not([tabindex=\'-1\'])',
-  '[contentEditable=true]:not([tabindex=\'-1\'])'
-].join(', ')
+type InternalModalProps<T, P> = {
+  entry: ModalEntry<T, P>;
+  className?: string;
+};
 
-type ModalProps = {
-  className?: string,
-  children?: ReactChildren,
-  label?: string,
-  role?: string,
-}
+const Modal = function <T, P>({ className, entry }: InternalModalProps<T, P>) {
+  const { role = 'dialog', label, labelledby, componentProps, Component } = entry;
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const { removeModal } = useContext(ModalContext);
 
-const Modal = function (props : ModalProps): ReactElement {
-  const { className, children, label, role } = props
-  const modalRef = useRef<HTMLDivElement>()
-  
-  useEffect(() => {
-    handleTabBoundary([0, 1])
-  }, [ modalRef ])
-  
-  const handleTabBoundary = (indexes : number[]) : void => {
-    const focusableElements = Array.from(modalRef?.current?.querySelectorAll<HTMLElement>(focusableSelector)) || []
-    const element = focusableElements.slice(...indexes)[0]
-    
-    if (element) { element.focus() }
-  }
-  
-  return <React.Fragment>
-    <div tabIndex={0} onFocus={() => handleTabBoundary([-1])}/>
-    <div
+  useLayoutEffect(() => {
+    requestAnimationFrame(() => {
+      if (!dialogRef.current) return;
+      dialogRef.current.showModal();
+      dialogRef.current.querySelector<HTMLElement>(focusableSelector)?.focus();
+    });
+  }, []);
+
+  const handleKey = useCallback(
+    (event: React.KeyboardEvent): void => {
+      if (event.key === ESC_KEY && !entry.ignoreEscape) {
+        removeModal(entry.id);
+      }
+    },
+    [entry, removeModal],
+  );
+
+  return (
+    <dialog
+      ref={dialogRef}
       role={role}
       aria-label={label}
-      ref={modalRef}
-      className={className}>{children}</div>
-    <div tabIndex={0} onFocus={() => handleTabBoundary([0, 1])}/>
-  </React.Fragment>
-}
+      aria-labelledby={labelledby}
+      className={className}
+      onKeyDown={handleKey}
+    >
+      <Component
+        modalId={entry.id}
+        close={entry.closeModal}
+        resolve={entry.resolveModal}
+        reject={entry.rejectModal}
+        {...componentProps}
+      />
+    </dialog>
+  );
+};
 
-export default Modal
+export default Modal;
