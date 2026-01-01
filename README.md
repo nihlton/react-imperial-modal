@@ -1,17 +1,23 @@
-# 👑 react-imperial-modal [sorta BETA]
+# 👑 react-imperial-modal
 **Imperative API for modals**
 
-Often, a interactive branching UI flow is complex enough that a declarative approach becomes too cumbersome and verbose.  Imagine an experience where an application prompts a user to confirm before a destructive action, then confirms the success or failure of the action.  The content of those modals, the result of the actions - all has to go into the state.
+```typescript
+  const favoriteColor = await openModal(Prompt, {
+    title: 'Question',
+    message: 'what is your favorite color?',
+  });
+```
 
-Now imagine that same page has actions for adding items, editing them etc.  It all quickly spirals out of control, with half your state is devoted to which modal is open or closed, forget whats inside them.
+Often, a interactive branching UI flow is complex enough that a declarative approach becomes too cumbersome and verbose.  Imagine an experience where an application prompts a user to confirm before a destructive action, then informs the user of the success or failure of the action.  The content of those modals, the result of the actions - all has to go into the state.
 
-Now imagine an imperative API implementation.
+Imagine that same page has actions for adding items, editing them etc.  It all quickly spirals out of control, with half your state devoted to which modal is open or closed, forget whats inside them. 🤮
 
+Now imagine an imperative API implementation 🌈
 
 [LIVE DEMO](https://codesandbox.io/s/hungry-pond-5exs1?file=/src/App.js)
 
 
-## Usage
+## Add it to your project
 
 ```
 yarn add react-imperial-modal
@@ -21,170 +27,193 @@ or
 npm install react-imperial-modal
 ```
 
+## Basic Usage
+
 wrap your app with `<ModalProvider>`
 
-```javascript
+```tsx
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { ModalProvider } from 'react-imperial-modal'
-
 import App from './App';
 
-ReactDOM.render(
-  <React.StrictMode>
+const container = document.getElementById('root');
+
+if (container) {
+  const root = createRoot(container);
+  root.render(
     <ModalProvider>
       <App />
-    </ModalProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    </ModalProvider>,
+  );
+}
+
 ```
 
-Import the `useModal` hook.  it provides two methods, `openModal`, and `closeModal`
+Define a modal with the `ModalProps` type
+```tsx
+  import type { ModalProps } from 'react-imperial-modal';
 
-  - openModal(modal, label, role).  returns a promise.
-    - **modal** - required.  any valid react element
-    - **label** - encouraged.  provides an aria content label for your modal
-    - **role** - optional.  'dialog' is default
+  type MyModalProps = { message: string } & ModalProps;
 
-  - closeModal(modal, result).  resolves the promise returned by `openModal`.  returns nothing.
-    - **modal** - required.  any valid react element
-    - **result** - optional.  used as the resolver value for the `openModal` promise.
-
-```javascript
-  import { useModal } from 'react-imperial-modal'
-  
-  ...
-  
-  const [ openModal, closeModal ] = useModal()
-
-  ...
-
-  const myModal = <div>
-    I am a modal.  
-    <button onClick={() => closeModal(myModal)}>ok</button>
-  </div>
-  openModal(myModal)
+  const MyModal = function (props: MyModalProps) {
+    const { message, close } = props;
+    return (
+      <div>
+        <p>{message}</p>
+        <button onClick={() => close()}>ok</button>
+      </div>
+    );
+  };
 ```
 
-    
-## Note:
-the **modal** argument should be defined ahead of time, since its reference is used to both open and close the modal. Defining the modal within the `openModal` function call will mean you can't close the modal programatically.  The user can still close it by clicking the back drop, or hitting the escape key.
-
+Import the `useModal` hook
+```tsx
+  import { useModal } from 'react-imperial-modal';
+  ...
+  const openModal = useModal();
+  ...
+  openModal(MyModal, { message: 'hello' });
+```
 
 ## Advanced Usage
 
-### Promises / async await
+### `openModal`  
 
-the `openModal` method returns a promise which is resolved by the `closeModal` method.
+The `openModal` method accepts a number of additional arguments.
+
+```typescript
+  <T, P>(
+    Component: React.ComponentType<P & ModalProps<T>>,
+    componentProps: P,              
+    ignoreEscape: boolean = false,  // `true` prevents the `ESC` key from closing the modal
+    label?: string,                 // aria attributes 
+    labelledby?: string,            // ..
+    role: string = 'dialog',        // ..
+  )
+```
+
+### `ModalProps` and Promises 
+
+The `openModal` method returns a promise which can be resolved within the modal.  The `ModalProps` type accepts an optional type argument that determines what values the promise will return.
 
 given:
-```javascript
-const Prompt = function(props) {
-  const [ myValue, setMyValue ] = useState('')
-  const { message, close } = props
-  
-  return <div>
-    <h1>Question</h1>
-    <p>{message}</p>
-    <input value={myValue} onChange={e => setMyValue(e.target.value)} />
-    <button onClick={() => close(false)}>cancel</button>
-    <button onClick={() => close(promptValue)}>ok</button>
-  </div>
-}
+```typescript
+  export interface ModalProps<T = void> {
+    modalId: string;
+    resolve: (val: T) => void;
+    reject: (reason?: unknown) => void;
+    close: () => void;
+  }
 ```
 
 you can:
-```javascript
-  const getUsersColor = async () => {
-    const colorModal = <Prompt
-      message='what is your favorite color?'
-      close={color => closeModal(colorModal, color)}/>
-      
-    const favoriteColor = await openModal(colorModal)
-  
-    console.log(favoriteColor)
-  }
+```tsx
+  type PromptProps = { title: string; message: string } & ModalProps<string | void>;
+
+  const Prompt = function (props: PromptProps) {
+    const [promptValue, setPromptValue] = useState<string>('');
+    const { title, message, resolve } = props;
+
+    return (
+      <div>
+        <h1>{title}</h1>
+        <p>{message}</p>
+        <input value={promptValue} onChange={(e) => setPromptValue(e.target.value)} />
+        <div>
+          <button onClick={() => resolve()}>cancel</button>
+          <button onClick={() => resolve(promptValue)}>ok</button>
+        </div>
+      </div>
+    );
+  };
 ```
 
-or
-```javascript
+then:
+```typeScript
+  const openModal = useModal();
+  ...
   const getUsersColor = () => {
-    const colorModal = <Prompt
-      message='what is your favorite color?'
-      close={color => closeModal(colorModal, color)}/>
-      
-    openModal(colorModal).then(favoriteColor => {
-    
-      console.log(favoriteColor)
-    
-    })
-  }
+    openModal(Prompt, {
+      title: 'Question',
+      message: 'what is your favorite color?',
+    }).then((favoriteColor) => console.log(favoriteColor));
+  };
+
+```
+or
+```typeScript
+  const openModal = useModal();
+  ...
+  const getUsersColor = async () => {
+    const favoriteColor = await openModal(Prompt, {
+      title: 'Question',
+      message: 'what is your favorite color?',
+    });
+
+    console.log(favoriteColor);
+  };
 ```
 
-### configuration
+### `useModalDangerously` 
 
-```javascript
-  // these are the defaults
-  const modalConfig = {
-    bodyOpenClass: 'modal-open',      // applied to body element
-    modalShadeClass: 'modal-shade',   // used to style modal back drop
-    modalContainerClass: 'modals',    // element which contains all modals
-    modalClass: 'modal',              // applied to each modal
-  }
-  
-  // function that returns your app element.
-  // will be hidden for screen readers (`aria-hidden`) while modals are open.
-  // if not provided, a div wrapped around the `ModalProvider` children will be `aria-hidden`
-  const appElement = () => document.getElementById('#some-element-id')
-  
-  ReactDOM.render(
-    <React.StrictMode>
-      <ModalProvider config={modalConfig} appElement={appElement} >
-        <App />
-      </ModalProvider>
-    </React.StrictMode>,
-    document.getElementById('root')
-  );
+`useModalDangerously` provides additional methods which can be used to control opened modal instances. These methods are offered as an escape hatch and should be used carefully.
+
+```typeScript
+  openModal: [...same as `useModal`...]
+  closeModal: (id?: string) => void;
+  resolveModal: (val: unknown, id?: string) => void;
+  rejectModal: (reason?: unknown, id?: string) => void;
 ```
 
+**Notes:** 
+  - `resolveModal` does not offer type safety.  *Use with caution!*
+  - the `id` arugment of `resolveModal`, `rejectModal`, and `closeModal` is optional.  Ommitting it will operate on the most recently opened modal.
+
+```typeScript
+  const [openModal, closeModal, resolveModal, rejectModal ] = useModalDangerously();
+
+  const nameModal = openModal(Prompt, { title: 'Name', message: 'choose a name' });
+```
+
+then:
+```typeScript
+  resolveModal('wisely', nameModal.id);  // this value cannot be type checked which can introduce runtime errors.
+```
+
+```typeScript
+  rejectModal(new Error('did not choose wisely')); // id not provided.  will close the most recent modal
+```
+
+```typeScript
+  closeModal(); // id not provided.  will close the most recent modal
+```
+
+
+### ModalProvider Config
+you can specify `class` attributes for the `<body/>` element, as well as the each modal element, and their container
+
+```typeScript
+  type ModalProviderConfig = {
+    bodyOpenClass?: string;
+    modalContainerClass?: string;
+    modalClass?: string;
+  };
+```
+```tsx
+  const modalConfiguration = {
+    bodyOpenClass: 'blur';
+    modalContainerClass: 'modals';
+    modalClass: 'modal';
+  }
+
+  <ModalProvider config={modalConfiguration} >
+    <App />
+  </ModalProvider>
+```
 
 ## CSS and styling
 
-No default CSS is provided or applied.  The following is provided as a recommendation, or starting point.
+No default CSS is provided nor applied.  The following is provided as a recommendation, or starting point.
 
-```css
-.modals {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 4000;
-}
-
-.modal-shade {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: #0005;
-  z-index: 4001;
-}
-
-.modal {
-  padding: 2rem;
-  background: white;
-  position: relative;
-  z-index: 4002;
-}
-```
-
-
-# TO DO
-  - idiot proof (null checks, warnings etc)
 
